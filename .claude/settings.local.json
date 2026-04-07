@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.venv/bin/python -m pip install nbconvert notebook)",
+      "Bash(.venv/bin/python -m pip show nbconvert)",
+      "Bash(find /Users/moses/Documents/Moses/01_Academic/Programming/Shallow_Machine_Learning/ml_course -name *.jpg -o -name *.png)",
+      "Bash(python3:*)",
+      "Bash(g-plan:*)",
+      "Bash(g:*)",
+      "Bash(g-design:*)"
+    ]
+  }
+}

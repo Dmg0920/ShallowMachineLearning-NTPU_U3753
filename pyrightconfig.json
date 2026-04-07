@@ -1,0 +1,12 @@
+{
+    "pythonVersion": "3.12",
+    "pythonPlatform": "Darwin",
+    "venvPath": ".",
+    "venv": ".venv",
+    "typeCheckingMode": "standard",
+    "reportMissingImports": "warning",
+    "reportMissingModuleSource": "warning",
+    "reportUndefinedVariable": "error",
+    "useLibraryCodeForTypes": true,
+    "autoImportCompletions": true
+}

@@ -1,0 +1,877 @@
+{
+  "cells": [
+    {
+      "index": 0,
+      "type": "code",
+      "title": "環境初始化與路徑設定",
+      "keywords": [
+        "setup",
+        "sys.path"
+      ],
+      "functions_defined": [
+        "setup"
+      ],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": ""
+    },
+    {
+      "index": 1,
+      "type": "markdown",
+      "title": "作品封面：標題、學號與姓名",
+      "keywords": [
+        "學號",
+        "姓名"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": ""
+    },
+    {
+      "index": 2,
+      "type": "markdown",
+      "title": "作品目標：SVD 壓縮、Patch 處理與人臉重建",
+      "keywords": [
+        "PCA",
+        "SVD",
+        "Patch",
+        "人臉辨識"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": ""
+    },
+    {
+      "index": 3,
+      "type": "markdown",
+      "title": "套件載入說明",
+      "keywords": [
+        "numpy",
+        "scipy",
+        "matplotlib",
+        "sklearn"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": ""
+    },
+    {
+      "index": 4,
+      "type": "code",
+      "title": "載入套件與設定繪圖風格",
+      "keywords": [
+        "rcParams",
+        "fonts",
+        "DPI"
+      ],
+      "functions_defined": [
+        "setup_beautiful_plotting"
+      ],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": ""
+    },
+    {
+      "index": 5,
+      "type": "markdown",
+      "title": "Section 1：PCA 與 SVD 在影像壓縮的差異",
+      "keywords": [
+        "Section 1",
+        "影像載入"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 6,
+      "type": "code",
+      "title": "浣熊影像載入、灰階化與 Resize",
+      "keywords": [
+        "scipy.datasets",
+        "zoom",
+        "grayscale"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "A",
+        "m",
+        "n",
+        "A_raw"
+      ],
+      "depends_on": [
+        4
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 7,
+      "type": "markdown",
+      "title": "1-1 奇異值能量分布與壓縮動機",
+      "keywords": [
+        "Cumulative Energy",
+        "Low-rank"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 8,
+      "type": "code",
+      "title": "影像 SVD 分解與能量累積分析",
+      "keywords": [
+        "np.linalg.svd",
+        "energy_ratio",
+        "thresholds"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "U",
+        "s",
+        "Vt",
+        "energy_ratio",
+        "q_thresholds"
+      ],
+      "depends_on": [
+        6
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 9,
+      "type": "markdown",
+      "title": "能量集中性與低秩結構觀察",
+      "keywords": [
+        "Eckart-Young",
+        "observation"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        8
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 10,
+      "type": "markdown",
+      "title": "1-2 SVD rank-q 重建與 PSNR 定義",
+      "keywords": [
+        "PSNR",
+        "MSE",
+        "Truncated SVD"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 11,
+      "type": "code",
+      "title": "不同 q 值下的重建品質實驗與摘要",
+      "keywords": [
+        "svd_reconstruct",
+        "psnr",
+        "compression ratio"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "q_values"
+      ],
+      "depends_on": [
+        8
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 12,
+      "type": "markdown",
+      "title": "重建效果與壓縮比之視覺觀察",
+      "keywords": [
+        "artifact",
+        "visual quality"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        11
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 13,
+      "type": "markdown",
+      "title": "1-3 Eckart-Young 定理數學原理",
+      "keywords": [
+        "Frobenius norm",
+        "error bound"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 14,
+      "type": "code",
+      "title": "Eckart-Young 定理數值驗證",
+      "keywords": [
+        "theoretical error",
+        "empirical error"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "err_theoretical",
+        "err_empirical"
+      ],
+      "depends_on": [
+        8
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 15,
+      "type": "markdown",
+      "title": "定理驗證結論：數值精度與完美重疊",
+      "keywords": [
+        "float64 precision",
+        "verification"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        14
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 16,
+      "type": "markdown",
+      "title": "1-3b Gavish-Donoho 最佳奇異值截斷門檻",
+      "keywords": [
+        "Optimal Hard Threshold",
+        "Gaussian Noise"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 17,
+      "type": "code",
+      "title": "定義 Gavish-Donoho 門檻計算函數",
+      "keywords": [
+        "sigma_hat",
+        "median",
+        "MAD"
+      ],
+      "functions_defined": [
+        "gavish_donoho_threshold"
+      ],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 18,
+      "type": "markdown",
+      "title": "Gavish-Donoho 分析結論與侷限性",
+      "keywords": [
+        "AWGN",
+        "overestimation"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        17
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 19,
+      "type": "markdown",
+      "title": "1-4 PCA 與 SVD 等價性驗證理論",
+      "keywords": [
+        "centering",
+        "Gram matrix",
+        "DC component"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 20,
+      "type": "code",
+      "title": "實作 PCA 與 SVD 之數值等價性比較",
+      "keywords": [
+        "np.linalg.eigh",
+        "centered SVD"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "A_centered",
+        "ATA",
+        "eigenvalues",
+        "V_pca"
+      ],
+      "depends_on": [
+        6
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 21,
+      "type": "code",
+      "title": "特徵向量符號對齊與重建誤差計算",
+      "keywords": [
+        "align_signs",
+        "inner product"
+      ],
+      "functions_defined": [
+        "align_signs"
+      ],
+      "variables_defined": [
+        "V_svd_aligned"
+      ],
+      "depends_on": [
+        20
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 22,
+      "type": "markdown",
+      "title": "PCA 與 SVD 等價性驗證結論",
+      "keywords": [
+        "numerical equivalence",
+        "Frobenius distance"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        21
+      ],
+      "section": "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異"
+    },
+    {
+      "index": 23,
+      "type": "markdown",
+      "title": "Section 2：影像前處理的效應 (Patch SVD)",
+      "keywords": [
+        "Section 2",
+        "local texture"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 24,
+      "type": "markdown",
+      "title": "2-2 Patch 函數動機與數學說明",
+      "keywords": [
+        "unfolding",
+        "patch matrix"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 25,
+      "type": "code",
+      "title": "實作影像 Patch 提取函數",
+      "keywords": [
+        "extract_patches",
+        "reshape"
+      ],
+      "functions_defined": [
+        "extract_patches"
+      ],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 26,
+      "type": "markdown",
+      "title": "2-3 Patch SVD 壓縮比公式推導",
+      "keywords": [
+        "storage overhead",
+        "compression ratio"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 27,
+      "type": "code",
+      "title": "實作 Patch 壓縮比計算函數",
+      "keywords": [
+        "patch_compression_ratio"
+      ],
+      "functions_defined": [
+        "patch_compression_ratio"
+      ],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 28,
+      "type": "markdown",
+      "title": "2-4 對照實驗設計：固定壓縮比比較品質",
+      "keywords": [
+        "target_ratio",
+        "experimental design"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 29,
+      "type": "code",
+      "title": "執行不同 Patch 大小之 SVD 實驗並快取結果",
+      "keywords": [
+        "patch_svd_cache",
+        "nested loop"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "patch_sizes",
+        "target_ratios",
+        "patch_svd_cache"
+      ],
+      "depends_on": [
+        6,
+        25,
+        27
+      ],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 30,
+      "type": "markdown",
+      "title": "2-5 結果視覺化導引",
+      "keywords": [
+        "visualization",
+        "grid plot"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 31,
+      "type": "code",
+      "title": "繪製 Patch SVD 重建品質網格比較圖",
+      "keywords": [
+        "imshow",
+        "grid axes"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        29
+      ],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 32,
+      "type": "markdown",
+      "title": "分析小 Patch 高壓縮比出現 NA 的原因",
+      "keywords": [
+        "storage cost",
+        "U matrix overhead"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        31
+      ],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 33,
+      "type": "markdown",
+      "title": "2-6 定量分析：奇異值熵與門檻秩",
+      "keywords": [
+        "SVE",
+        "Singular Value Entropy",
+        "Effective Rank"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 34,
+      "type": "code",
+      "title": "實作奇異值熵與門檻秩計算函數",
+      "keywords": [
+        "calculate_sve",
+        "get_threshold_rank"
+      ],
+      "functions_defined": [
+        "calculate_sve",
+        "get_threshold_rank"
+      ],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 35,
+      "type": "code",
+      "title": "繪製 PSNR vs 壓縮比連續曲線圖",
+      "keywords": [
+        "PSNR curve",
+        "ratio curve"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "colors_map"
+      ],
+      "depends_on": [
+        29
+      ],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 36,
+      "type": "markdown",
+      "title": "Patch Size 表現之數學解釋與 SVE 關聯",
+      "keywords": [
+        "Low-rankness",
+        "receptive field"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        35
+      ],
+      "section": "Section 2：影像前處理的效應（Patch SVD）"
+    },
+    {
+      "index": 37,
+      "type": "markdown",
+      "title": "Section 3：人臉資料矩陣的壓縮與重建",
+      "keywords": [
+        "Section 3",
+        "Olivetti Faces",
+        "Eigenfaces"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 38,
+      "type": "code",
+      "title": "載入 Olivetti Faces 資料集",
+      "keywords": [
+        "fetch_olivetti_faces",
+        "sklearn.datasets"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "X",
+        "X_images",
+        "y"
+      ],
+      "depends_on": [
+        4
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 39,
+      "type": "markdown",
+      "title": "3-1 人臉資料初步視覺化",
+      "keywords": [
+        "visualization",
+        "preview"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 40,
+      "type": "code",
+      "title": "展示隨機人臉與受試者分類樣本",
+      "keywords": [
+        "random face",
+        "subject preview"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        38
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 41,
+      "type": "markdown",
+      "title": "3-2 資料前處理與均值臉計算",
+      "keywords": [
+        "mean face",
+        "centering"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 42,
+      "type": "code",
+      "title": "計算、展示均值臉並執行中心化",
+      "keywords": [
+        "mean_face_vec",
+        "A_faces_centered"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "mean_face_vec",
+        "mean_face",
+        "A_faces_centered"
+      ],
+      "depends_on": [
+        38
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 43,
+      "type": "markdown",
+      "title": "3-3 完整 SVD 分解與能量分析",
+      "keywords": [
+        "SVD on faces",
+        "memory saving"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 44,
+      "type": "code",
+      "title": "人臉矩陣 SVD 分解與能量累積圖",
+      "keywords": [
+        "U_f",
+        "s_f",
+        "Vt_f",
+        "energy_ratio_f"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "U_f",
+        "s_f",
+        "Vt_f",
+        "energy_f",
+        "q_f"
+      ],
+      "depends_on": [
+        42
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 45,
+      "type": "markdown",
+      "title": "人臉與自然影像之能量集中性比較",
+      "keywords": [
+        "common structure",
+        "regularity"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        44
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 46,
+      "type": "markdown",
+      "title": "3-4 Eigenfaces 視覺展示說明",
+      "keywords": [
+        "Eigenfaces",
+        "variation direction"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 47,
+      "type": "code",
+      "title": "顯示前 50 個 Eigenfaces 與其能量佔比",
+      "keywords": [
+        "eigenface display",
+        "color mapping"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        44
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 48,
+      "type": "markdown",
+      "title": "3-5 rank-q 重建品質量化分析",
+      "keywords": [
+        "reconstruction stats",
+        "PSNR distribution"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 49,
+      "type": "code",
+      "title": "計算不同 q 值下之人臉重建統計量",
+      "keywords": [
+        "psnr_stats",
+        "vectorized psnr"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "q_values_f",
+        "psnr_stats"
+      ],
+      "depends_on": [
+        44
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 50,
+      "type": "code",
+      "title": "特定受試者之視覺重建對比",
+      "keywords": [
+        "reconstructed_cache",
+        "comparison plot"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "reconstructed_cache"
+      ],
+      "depends_on": [
+        44,
+        49
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 51,
+      "type": "markdown",
+      "title": "3-5b 離群個案 (Outlier) 分析動機",
+      "keywords": [
+        "worst compression",
+        "best compression"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 52,
+      "type": "code",
+      "title": "找出 PSNR 離群值之受試者人臉",
+      "keywords": [
+        "worst_idx",
+        "best_idx",
+        "outlier"
+      ],
+      "functions_defined": [],
+      "variables_defined": [
+        "worst_idx",
+        "best_idx"
+      ],
+      "depends_on": [
+        50
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 53,
+      "type": "markdown",
+      "title": "重建品質隨 q 值變化之分佈分析",
+      "keywords": [
+        "individual difference",
+        "standard deviation"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        52
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 54,
+      "type": "markdown",
+      "title": "3-6 針對不同場景之特徵數量 (q) 建議表",
+      "keywords": [
+        "recommendation table",
+        "fisher criteria"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [
+        53
+      ],
+      "section": "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）"
+    },
+    {
+      "index": 55,
+      "type": "markdown",
+      "title": "總結論：定理驗證、Patch 效應與人臉特徵",
+      "keywords": [
+        "final conclusion",
+        "summary"
+      ],
+      "functions_defined": [],
+      "variables_defined": [],
+      "depends_on": [],
+      "section": "總結論"
+    }
+  ],
+  "sections": [
+    "Section 1：PCA 與 SVD 運用於影像壓縮與重建的差異",
+    "Section 2：影像前處理的效應（Patch SVD）",
+    "Section 3：人臉資料矩陣的壓縮與重建（AT&T Faces / Olivetti）",
+    "總結論"
+  ],
+  "summary": "本研究探討 SVD 與 PCA 在影像壓縮及人臉特徵提取的應用，透過數值實驗驗證 Eckart-Young 定理，並分析 Patch 前處理對不同壓縮倍數下重建品質的影響。"
+}

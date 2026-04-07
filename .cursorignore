@@ -1,0 +1,26 @@
+# ── General ───────────────────────────────────────────────────────────────
+.git/
+.venv/
+venv/
+__pycache__/
+.DS_Store
+
+# ── Project Specific Data & Assets ────────────────────────────────────────
+# 排除大型資料與圖片目錄，優化 AI 索引效能
+**/data/
+**/pictures/
+*.pkl
+*.mat
+InClassCoding/.git/
+
+# 排除作業生成的非程式碼檔案
+Homework/*.pdf
+Homework/*.xlsx
+Homework/*.png
+Homework/*.html
+Homework/*.ipynb.bak
+Homework/*.nb-index.json
+
+# ── Jupyter Notebooks ──────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
