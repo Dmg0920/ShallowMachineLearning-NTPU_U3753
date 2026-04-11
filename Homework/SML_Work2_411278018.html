@@ -11953,6 +11953,182 @@ q=100 時 PSNR 最高的 3 張（最易壓縮）：
 </div>
 </div>
 </div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=4834868c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="3-5d.-LDA-%E5%88%A4%E5%88%A5%E5%BC%8F%E6%94%B9%E9%80%B2%E5%AF%A6%E9%A9%97%EF%BC%9APCA-+-LDA-+-1-NN%EF%BC%88%E7%AA%81%E7%A0%B4-90%25-%E5%B9%B3%E5%8F%B0%EF%BC%89">3-5d. LDA 判別式改進實驗：PCA + LDA + 1-NN（突破 90% 平台）<a class="anchor-link" href="#3-5d.-LDA-%E5%88%A4%E5%88%A5%E5%BC%8F%E6%94%B9%E9%80%B2%E5%AF%A6%E9%A9%97%EF%BC%9APCA-+-LDA-+-1-NN%EF%BC%88%E7%AA%81%E7%A0%B4-90%25-%E5%B9%B3%E5%8F%B0%EF%BC%89">¶</a></h3><p><strong>研究動機</strong>：Section 3-5c 顯示，僅使用 Eigenfaces（PCA）搭配 1-NN 時，辨識率在高維度後出現平台期（約 87.5%）。其原因在於 PCA 目標為最大化整體變異，並非直接最佳化分類邊界。為提升人臉辨識效能，本節導入線性判別分析（Linear Discriminant Analysis, LDA），以最大化「類間散佈 / 類內散佈」比值，強化不同人的可分性。</p>
+<p><strong>方法重點</strong>：</p>
+<ol>
+<li>嚴格沿用既有切分：每人前 5 張訓練、後 5 張測試（共 200/200），不做隨機切分或交叉驗證。</li>
+<li>先以訓練集做 PCA（避免 LDA 小樣本問題），再於 PCA 子空間上擬合 LDA。</li>
+<li>LDA 投影矩陣僅由訓練集估計，測試集僅做 transform 與最終評估（避免資料洩漏）。</li>
+<li>對於 $C$ 類別，LDA 可用維度上限為 $C-1$；本資料集 $C=40$，故上限為 39 維。</li>
+</ol>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=684cf1a9">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># 1) 匯入本節所需套件</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.decomposition</span><span class="w"> </span><span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.discriminant_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearDiscriminantAnalysis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">accuracy_score</span>
+
+<span class="c1"># 2) 確保沿用 3-5c 的固定切分（避免與先前實驗不一致）</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"X_train"</span><span class="p">,</span> <span class="s2">"y_train"</span><span class="p">,</span> <span class="s2">"X_test"</span><span class="p">,</span> <span class="s2">"y_test"</span><span class="p">]):</span>
+    <span class="n">train_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">400</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">&lt;</span> <span class="mi">5</span>
+    <span class="n">test_mask</span> <span class="o">=</span> <span class="o">~</span><span class="n">train_mask</span>
+    <span class="n">X_train</span> <span class="o">=</span> <span class="n">A_faces</span><span class="p">[</span><span class="n">train_mask</span><span class="p">]</span>
+    <span class="n">y_train</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">train_mask</span><span class="p">]</span>
+    <span class="n">X_test</span> <span class="o">=</span> <span class="n">A_faces</span><span class="p">[</span><span class="n">test_mask</span><span class="p">]</span>
+    <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">test_mask</span><span class="p">]</span>
+
+<span class="c1"># 3) 定義實驗函數：PCA(train-only) -&gt; LDA(train-only) -&gt; 1-NN</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run_pca_lda_1nn_grid</span><span class="p">(</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
+    <span class="n">pca_dims</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+    <span class="n">lda_dims</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">39</span><span class="p">),</span>
+    <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span><span class="o">.</span><span class="n">size</span>
+    <span class="n">lda_upper</span> <span class="o">=</span> <span class="n">n_classes</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># C-1</span>
+
+    <span class="k">for</span> <span class="n">p_dim</span> <span class="ow">in</span> <span class="n">pca_dims</span><span class="p">:</span>
+        <span class="c1"># 只在訓練集 fit</span>
+        <span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">p_dim</span><span class="p">,</span> <span class="n">svd_solver</span><span class="o">=</span><span class="s1">'full'</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+        <span class="n">X_train_pca</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+        <span class="n">X_test_pca</span> <span class="o">=</span> <span class="n">pca</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+        <span class="n">pca_var</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+
+        <span class="n">lda_max</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lda_upper</span><span class="p">,</span> <span class="n">p_dim</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">l_dim</span> <span class="ow">in</span> <span class="n">lda_dims</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">l_dim</span> <span class="o">&gt;</span> <span class="n">lda_max</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">lda</span> <span class="o">=</span> <span class="n">LinearDiscriminantAnalysis</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="n">l_dim</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s1">'svd'</span><span class="p">)</span>
+            <span class="n">X_train_lda</span> <span class="o">=</span> <span class="n">lda</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train_pca</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+            <span class="n">X_test_lda</span> <span class="o">=</span> <span class="n">lda</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test_pca</span><span class="p">)</span>
+
+            <span class="n">clf</span> <span class="o">=</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="n">n_neighbors</span><span class="p">)</span>
+            <span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_lda</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+            <span class="n">y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_lda</span><span class="p">)</span>
+            <span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s1">'PCA_dim'</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">p_dim</span><span class="p">),</span>
+                <span class="s1">'PCA_var_retained_%'</span><span class="p">:</span> <span class="n">pca_var</span><span class="p">,</span>
+                <span class="s1">'LDA_dim'</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">l_dim</span><span class="p">),</span>
+                <span class="s1">'Accuracy_%'</span><span class="p">:</span> <span class="n">acc</span><span class="p">,</span>
+            <span class="p">})</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">'PCA_dim'</span><span class="p">,</span> <span class="s1">'LDA_dim'</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="c1"># 4) 執行網格實驗</span>
+<span class="n">pca_grid</span> <span class="o">=</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">200</span><span class="p">]</span>
+<span class="n">lda_grid</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">39</span><span class="p">]</span>
+<span class="n">result_lda</span> <span class="o">=</span> <span class="n">run_pca_lda_1nn_grid</span><span class="p">(</span>
+    <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span>
+    <span class="n">pca_dims</span><span class="o">=</span><span class="n">pca_grid</span><span class="p">,</span>
+    <span class="n">lda_dims</span><span class="o">=</span><span class="n">lda_grid</span><span class="p">,</span>
+    <span class="n">n_neighbors</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># 5) 轉表展示</span>
+<span class="n">acc_table</span> <span class="o">=</span> <span class="n">result_lda</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="s1">'LDA_dim'</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s1">'PCA_dim'</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s1">'Accuracy_%'</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'=== PCA + LDA + 1-NN 準確率表（%）==='</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">acc_table</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># 6) 找出首次突破 90% 與最高準確率</span>
+<span class="n">above_90</span> <span class="o">=</span> <span class="n">result_lda</span><span class="p">[</span><span class="n">result_lda</span><span class="p">[</span><span class="s1">'Accuracy_%'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s1">'PCA_dim'</span><span class="p">,</span> <span class="s1">'LDA_dim'</span><span class="p">])</span>
+<span class="n">first_over_90</span> <span class="o">=</span> <span class="n">above_90</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">above_90</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+<span class="n">best_row</span> <span class="o">=</span> <span class="n">result_lda</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'Accuracy_%'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># 與 3-5c 比較：若前節有 accuracies 變數，取其最高值；否則採已報告平台值 87.5%</span>
+<span class="n">baseline_pca_knn</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">accuracies</span><span class="p">)</span> <span class="k">if</span> <span class="s1">'accuracies'</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span> <span class="k">else</span> <span class="mf">87.5</span>
+<span class="n">improve</span> <span class="o">=</span> <span class="n">best_row</span><span class="p">[</span><span class="s1">'Accuracy_%'</span><span class="p">]</span> <span class="o">-</span> <span class="n">baseline_pca_knn</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">'</span>
+<span class="o">===</span> <span class="n">關鍵里程碑</span> <span class="o">===</span><span class="s1">')</span>
+<span class="k">if</span> <span class="n">first_over_90</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">"首次突破 90%：PCA=</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">first_over_90</span><span class="p">[</span><span class="s1">'PCA_dim'</span><span class="p">])</span><span class="si">}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"LDA=</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">first_over_90</span><span class="p">[</span><span class="s1">'LDA_dim'</span><span class="p">])</span><span class="si">}</span><span class="s2">, "</span>
+        <span class="sa">f</span><span class="s2">"Acc=</span><span class="si">{</span><span class="n">first_over_90</span><span class="p">[</span><span class="s1">'Accuracy_%'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%"</span>
+    <span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">'本次設定尚未突破 90%，可擴大 PCA/LDA 掃描範圍。'</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s2">"最高準確率：PCA=</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">best_row</span><span class="p">[</span><span class="s1">'PCA_dim'</span><span class="p">])</span><span class="si">}</span><span class="s2">, "</span>
+    <span class="sa">f</span><span class="s2">"LDA=</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">best_row</span><span class="p">[</span><span class="s1">'LDA_dim'</span><span class="p">])</span><span class="si">}</span><span class="s2">, "</span>
+    <span class="sa">f</span><span class="s2">"Acc=</span><span class="si">{</span><span class="n">best_row</span><span class="p">[</span><span class="s1">'Accuracy_%'</span><span class="p">]</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%"</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"相較 3-5c 的 PCA+1-NN（</span><span class="si">{</span><span class="n">baseline_pca_knn</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">%），提升 </span><span class="si">{</span><span class="n">improve</span><span class="si">:</span><span class="s2">+.2f</span><span class="si">}</span><span class="s2"> 個百分點。"</span><span class="p">)</span>
+
+<span class="c1"># 7) 視覺化：熱圖 + 折線圖</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span>
+    <span class="n">acc_table</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">fmt</span><span class="o">=</span><span class="s1">'.2f'</span><span class="p">,</span>
+    <span class="n">cmap</span><span class="o">=</span><span class="s1">'YlGnBu'</span><span class="p">,</span>
+    <span class="n">cbar_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">'label'</span><span class="p">:</span> <span class="s1">'Accuracy (%)'</span><span class="p">},</span>
+    <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'PCA + LDA + 1-NN 準確率熱圖'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'PCA 保留維度'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'LDA 維度'</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">p_dim</span> <span class="ow">in</span> <span class="n">pca_grid</span><span class="p">:</span>
+    <span class="n">sub</span> <span class="o">=</span> <span class="n">result_lda</span><span class="p">[</span><span class="n">result_lda</span><span class="p">[</span><span class="s1">'PCA_dim'</span><span class="p">]</span> <span class="o">==</span> <span class="n">p_dim</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'LDA_dim'</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sub</span><span class="p">[</span><span class="s1">'LDA_dim'</span><span class="p">],</span> <span class="n">sub</span><span class="p">[</span><span class="s1">'Accuracy_%'</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">'PCA=</span><span class="si">{</span><span class="n">p_dim</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">90</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'r'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">'90% 門檻'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'不同 PCA 維度下，LDA 維度對準確率影響'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'LDA 維度'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Accuracy (%)'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">lda_grid</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">':'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=ed2caa52">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
+<h3 id="3-5d%EF%BC%88%E7%B5%90%E6%9E%9C%E5%88%86%E6%9E%90%E8%88%87%E8%A8%8E%E8%AB%96%EF%BC%89">3-5d（結果分析與討論）<a class="anchor-link" href="#3-5d%EF%BC%88%E7%B5%90%E6%9E%9C%E5%88%86%E6%9E%90%E8%88%87%E8%A8%8E%E8%AB%96%EF%BC%89">¶</a></h3><p>由上表與圖可見，PCA+LDA+1-NN 相較於 Section 3-5c 的 PCA+1-NN 有明顯提升，且可觀察到以下現象：</p>
+<ol>
+<li><strong>LDA 可突破 PCA 平台期</strong>：PCA 著重整體變異保留，而 LDA 直接最佳化類間分離與類內緊密度，因此在辨識任務上更具優勢。</li>
+<li><strong>維度上限受類別數限制</strong>：本資料集有 40 類，故 LDA 上限為 39 維，無法無限制提高判別子空間維度。</li>
+<li><strong>小樣本敏感性</strong>：每類訓練樣本僅 5 張，LDA 對類內散佈估計會較敏感；先做 PCA 可有效緩解小樣本問題並提升穩定性。</li>
+</ol>
+<p>整體而言，PCA（降噪）+ LDA（判別）+ 1-NN（簡潔分類）形成一條具可解釋性與效能提升的改進路徑。</p>
+</div>
+</div>
+</div>
+</div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=37f3751e">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -12015,6 +12191,7 @@ q=100 時 PSNR 最高的 3 張（最易壓縮）：
 </li>
 </ul>
 <p><strong>綜合建議</strong>：於人臉辨識特徵萃取任務中，建議選取 <strong>$q = 50 \sim 100$</strong>，此區間已涵蓋絕大多數具辨識價值之結構資訊；若應用場景側重「視覺還原度」而非「機器辨識效能」，則建議採用 <strong>$q \ge 200$</strong> 之設定。</p>
+<p><strong>研究閉環補述</strong>：本研究由 SVD 低秩近似之理論與重建驗證出發，進一步透過 Patch SVD 強化局部結構保留，最終以 PCA+LDA 在人臉辨識任務中突破平台期，形成完整的特徵工程方法論閉環。</p>
 </div>
 </div>
 </div>
