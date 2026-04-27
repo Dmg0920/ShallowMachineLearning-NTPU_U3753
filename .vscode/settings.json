@@ -17,5 +17,6 @@
         "**/__pycache__": true,
         "**/data": true,
         "**/pictures": true
-    }
+    },
+    "python-envs.pythonProjects": []
 }
