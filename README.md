@@ -1,67 +1,54 @@
-# 淺度機器學習 (Shallow Machine Learning) 課程專案
+# 淺度機器學習課程專案
 
-這是一個關於「淺度機器學習」課程的學習記錄與作業存放庫。本專案包含了課堂練習、作業實作、個人練習以及相關的筆記與資料。
+本儲存庫記錄「Shallow Machine Learning」課程的課堂實作、作業提交、個人練習與筆記。內容以 Jupyter Notebook 為主，涵蓋 PCA/SVD、分類模型、影像與人臉分析等主題。
 
-## 🚀 專案概述
+## 專案內容
 
-本專案主要探討經典的機器學習技術，重點包括：
-- **降維技術 (Dimensionality Reduction)**：PCA (主成分分析)、SVD (奇異值分解)。
-- **特徵提取 (Feature Extraction)**：Eigenfaces (特徵臉) 應用於人臉分析。
-- **數據視覺化**：Digits (手寫數字) 與影像處理。
-- **統計分析**：協方差矩陣、線性相關性與數據預處理。
+- `InClassCoding/`: 課堂示範與練習（如 `PCA_tutorial.ipynb`、`Classification_tutorial.ipynb`、`facenetPytorch_demo.ipynb`）。
+- `Homework/`: 作業與輸出檔（`SML_Work1_411278018.*`、`SML_Work2_411278018.*`、`SML_Work3_411278018.ipynb`）。
+- `MyPractice/`: 個人延伸練習與資料/圖片。
+- `Notes/`: 課堂筆記（目前為 `0304_PCA_Notes.ipynb`）。
+- 根目錄工具腳本：`inspect_nb.py`、`patch_nb.py`、`refactor_notebook.py`、`matplotlib_config.py`。
 
-## 📂 目錄結構
+## 建議環境
 
-```text
-.
-├── Homework/               # 課程作業 (如 SML_Work1, SML_Work2)
-│   ├── run_face_analysis.py # 人臉分析腳本
-│   └── *.ipynb, *.pdf      # 作業實作與匯出文件
-├── InClassCoding/          # 課堂實作範例
-│   ├── PCA_SVD_Digits.ipynb
-│   ├── PCA_tutorial.ipynb
-│   └── data/               # 課堂使用的數據集
-├── MyPractice/             # 個人練習與實驗
-├── Notes/                  # 課程筆記 (Jupyter Notebook 格式)
-├── data/                   # 共用數據集
-├── requirements.txt        # 專案依賴清單
-└── pyproject.toml          # 專案配置 (使用 uv 管理)
-```
+- Python `3.12+`
+- 建議使用虛擬環境（專案內已有 `.venv/`）
 
-## 🛠️ 環境設定
+## 安裝方式
 
-本專案建議使用 Python 3.12+ 以及 [uv](https://github.com/astral-sh/uv) 進行管理。
-
-### 1. 安裝依賴
-
-你可以使用 `uv` 快速同步環境：
+### 方式 1：使用 `uv`（建議）
 
 ```bash
 uv sync
 ```
 
-或者使用傳統的 `pip`：
+### 方式 2：使用 `pip`
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 2. 主要依賴庫
+## 常用套件
 
-- `numpy`, `scipy`: 數值計算與線性代數。
-- `pandas`: 數據處理與分析。
-- `scikit-learn`: 機器學習算法實作。
-- `matplotlib`, `seaborn`: 數據視覺化。
-- `scikit-image`, `Pillow`: 影像處理。
+目前 `requirements.txt` 以 PyTorch 生態為主：
 
-## 📝 重點筆記內容
+- `torch`、`torchvision`、`torchaudio`
+- `numpy`
+- `pillow`
 
-- **0304 PCA Notes**: 深入探討 PCA 的數學原理、協方差矩陣以及如何解決高維度數據的計算與線性相關問題。
-- **Face Analysis**: 實作 Eigenfaces 技術，進行人臉重建與降維分析。
+## 使用方式
 
-## 🤝 貢獻與使用
+1. 啟用虛擬環境。
+2. 開啟 Jupyter Lab/Notebook。
+3. 依資料夾目的執行對應 notebook：
+   - 想看課堂流程：從 `InClassCoding/` 開始。
+   - 想看作業成果：進入 `Homework/`。
+   - 想看筆記整理：查看 `Notes/`。
 
-這是我個人的學習記錄，歡迎參考。如果你發現任何錯誤或有改進建議，請隨時提出。
+## 備註
 
----
-*Last updated: 2026-04-07*
+- 本專案為個人課程學習紀錄，檔案命名與內容依課程進度持續更新。
+- 若僅需檢視結果，可直接閱讀 `Homework/` 中的 `html` 或 `pdf` 匯出檔。
